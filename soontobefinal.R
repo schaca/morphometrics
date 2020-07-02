@@ -1,7 +1,13 @@
-# This script produces ........  using ........ packages and following ...... (reference)
+# This script produces GPA & PCA results for diatom morphometrics using the packages ggplot2, shapes, usethis, devtools, ellipse and roxygen2. This script was created following 'Comprehensive methods for leaf geometric morphometric analyses', Laura L. Klein & Harlan T. Svoboda (DOI:10.21769/BioProtoc.2269)
+...... (reference)
 
 # Load ggplot2 package
-library("ggplot2")
+library(ggplot2)
+library(shapes)
+library(usethis)
+library(devtools)
+library(ellipse)
+library(roxygen2)
 
 # Read data from .txt file
 data <- read.delim("morpho_data2.txt", header=TRUE)
@@ -66,42 +72,42 @@ for(i in 1:59) {
     coord_fixed(ratio=1)
   ggsave(plot,filename=paste(label,".png",sep=""))}
   
-  library(shapes)
-  library(usethis)
-  library(devtools)
-  library(ellipse)
-  library(roxygen2)
-  
-  #specify landmark number(k), landmark dimensions (m) and number of samples (n); this example uses 44 landmarks.
+
+  #Specify landmark number(k), landmark dimensions (m) and number of samples (n); this example uses 44 landmarks.
   k<-44
   m<-2
   n<-59
   
-  
+  #Get the coordinates from the main data sheet; write it as a separate table and save as .txt file.
   coords <-  data[,5:92]
   write.table(coords, file="coords.txt", col.names = FALSE, row.names = FALSE)
   coords_table<-read.in("coords.txt",k,m)
   
+  #Perform GPA on the coordinates 
   GPA<- procGPA(coords_table, reflect=TRUE, scale=FALSE)
   
-  #specify desired PCs for visualization
-  shapepca(GPA,pcno=c(1,2))
+  #Specify desired PCs for visualization
+  shapepca(GPA,pcno=c(1,2,3))
   
+  ################################################################
+  #Bar graph of the percent variance explained by PC 1-3
   GPA_percentages<-as.matrix(GPA$percent)
   PC_numbers<- 1:59
-  GPA_percents<-cbind(GPA_percentages, PC_numbers, header=TRUE)
+  GPA_percents<-cbind(GPA_percentages, PC_numbers)
   colnames(GPA_percents)<-c("percent", "PC")
   
   
-  p <- ggplot(data, aes(x=factor(PC), y=percent)) + geom_col()
-  p + geom_col()
+  p <- ggplot(data, aes(x=factor(PC), y=percent)) + geom_bar()
+  p + geom_bar()
+  ##################################################################
   
   
-  
+ #A matrix with the PC scores and the corresponding culture numbers was made so that PCA could be performed and displayed. 
   culture_numbers<-as.factor(data$Culture_nr.)
   GPA_scores<-GPA$scores
   PCA_matrix<-cbind(culture_numbers,as.data.frame(GPA_scores))
-  
+
+  #Visualizing the PCA.The different culture numbers are used to color the data.95% confidence ellipses are added around species points using ‘stat_ellipse.’
   p<-ggplot(PCA_matrix, aes(PC1, PC2, colour=culture_numbers))
   p + geom_point(size=2.5, alpha=0.75) + scale_colour_manual(values=c("purple4","green4","mediumblue", "yellow3")) + theme_bw() + stat_ellipse(size=2, alpha=0.75)
   
