@@ -1,7 +1,6 @@
 # This script produces GPA & PCA results for diatom morphometrics using the packages ggplot2, shapes, usethis, devtools, ellipse and roxygen2. This script was created following 'Comprehensive methods for leaf geometric morphometric analyses', Laura L. Klein & Harlan T. Svoboda (DOI:10.21769/BioProtoc.2269)
-...... (reference)
 
-# Load ggplot2 package
+# Load R packages 
 library(ggplot2)
 library(shapes)
 library(usethis)
