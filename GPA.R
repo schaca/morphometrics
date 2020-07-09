@@ -104,5 +104,3 @@ PCA_matrix<-cbind(culture_numbers,as.data.frame(GPA_scores))
 #Visualizing the PCA.The different culture numbers are used to color the data.95% confidence ellipses are added around species points using ‘stat_ellipse.’
 p<-ggplot(PCA_matrix, aes(PC1, PC2, colour=culture_numbers))
 p + geom_point(size=2.5, alpha=0.75) + scale_colour_manual(values=c("purple4","green4","mediumblue", "yellow3")) + theme_bw() + stat_ellipse(size=2, alpha=0.75)
-
-
