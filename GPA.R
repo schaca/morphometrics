@@ -70,44 +70,37 @@ for(i in 1:59) {
     theme_bw() + 
     coord_fixed(ratio=1)
   ggsave(plot,filename=paste(label,".png",sep=""))}
-  
 
-  #Specify landmark number(k), landmark dimensions (m) and number of samples (n); this example uses 44 landmarks.
-  k<-44
-  m<-2
-  n<-59
-  
-  #Get the coordinates from the main data sheet; write it as a separate table and save as .txt file.
-  coords <-  data[,5:92]
-  write.table(coords, file="coords.txt", col.names = FALSE, row.names = FALSE)
-  coords_table<-read.in("coords.txt",k,m)
-  
-  #Perform GPA on the coordinates 
-  GPA<- procGPA(coords_table, reflect=TRUE, scale=FALSE)
-  
-  #Specify desired PCs for visualization
-  shapepca(GPA,pcno=c(1,2,3))
-  
-  ################################################################
-  #Bar graph of the percent variance explained by PC 1-3
-  GPA_percentages<-as.matrix(GPA$percent)
-  PC_numbers<- 1:59
-  GPA_percents<-cbind(GPA_percentages, PC_numbers)
-  colnames(GPA_percents)<-c("percent", "PC")
-  
-  
-  p <- ggplot(data, aes(x=factor(PC), y=percent)) + geom_bar()
-  p + geom_bar()
-  ##################################################################
-  
-  
- #A matrix with the PC scores and the corresponding culture numbers was made so that PCA could be performed and displayed. 
-  culture_numbers<-as.factor(data$Culture_nr.)
-  GPA_scores<-GPA$scores
-  PCA_matrix<-cbind(culture_numbers,as.data.frame(GPA_scores))
 
-  #Visualizing the PCA.The different culture numbers are used to color the data.95% confidence ellipses are added around species points using ‘stat_ellipse.’
-  p<-ggplot(PCA_matrix, aes(PC1, PC2, colour=culture_numbers))
-  p + geom_point(size=2.5, alpha=0.75) + scale_colour_manual(values=c("purple4","green4","mediumblue", "yellow3")) + theme_bw() + stat_ellipse(size=2, alpha=0.75)
-  
+#Specify landmark number(k), landmark dimensions (m) and number of samples (n); this example uses 44 landmarks.
+k<-44
+m<-2
+n<-59
 
+#Get the coordinates from the main data sheet; write it as a separate table and save as .txt file.
+coords <-  data[,5:92]
+write.table(coords, file="coords.txt", col.names = FALSE, row.names = FALSE)
+coords_table<-read.in("coords.txt",k,m)
+
+#Perform GPA on the coordinates 
+GPA<- procGPA(coords_table, reflect=TRUE, scale=FALSE)
+#Specify desired PCs for visualization
+shapepca(GPA,pcno=c(1,2,3))
+
+#Bar graph of the percent variance explained by PC 1-3
+GPA_percentages<-round(as.matrix(GPA$percent), digits=2)
+PC_numbers<- 1:59
+GPA_percents<-cbind(GPA_percentages, PC_numbers)
+colnames(GPA_percents)<-c("percents", "PC")
+bargraph<-as.data.frame(GPA_percents[1:3,1:2])
+ggplot(data=bargraph, aes(x=PC, y=percents, fill=PC))+geom_bar(aes(x=PC),fill="purple4",stat="identity")+guides(fill=FALSE)+geom_text(aes(label=percents), vjust=-0.5, size=4.1)
+
+
+#A matrix with the PC scores and the corresponding culture numbers was made so that PCA could be performed and displayed. 
+culture_numbers<-as.factor(data$Culture_nr.)
+GPA_scores<-GPA$scores
+PCA_matrix<-cbind(culture_numbers,as.data.frame(GPA_scores))
+
+#Visualizing the PCA.The different culture numbers are used to color the data.95% confidence ellipses are added around species points using ‘stat_ellipse.’
+p<-ggplot(PCA_matrix, aes(PC1, PC2, colour=culture_numbers))
+p + geom_point(size=2.5, alpha=0.75) + scale_colour_manual(values=c("purple4","green4","mediumblue", "yellow3")) + theme_bw() + stat_ellipse(size=2, alpha=0.75)
